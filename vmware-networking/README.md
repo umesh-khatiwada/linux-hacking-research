@@ -3,7 +3,21 @@
 ## 1. Introduction
 VMware networking allows virtual machines (VMs) to communicate with each other, the host system, and external networks. Understanding the different networking modes is crucial for building secure and functional lab environments.
 
-## 2. Core Networking Modes
+## 2. Installation & Kernel Module Setup
+Before configuring networking, ensure that the necessary kernel modules are built and installed. This is often required after a kernel update.
+
+### Install Dependencies
+```bash
+sudo apt update
+sudo apt install build-essential linux-headers-$(uname -r)
+```
+
+### Build & Install VMware Modules
+```bash
+sudo vmware-modconfig --console --install-all
+```
+
+## 3. Core Networking Modes
 
 ### Bridged Networking
 - **Description**: The VM appears as a unique device on the same physical network as the host.
@@ -24,26 +38,26 @@ VMware networking allows virtual machines (VMs) to communicate with each other, 
 - **Description**: Allows creating private virtual networks (LAN segments) that are completely isolated from the host and external networks.
 - **Use Case**: Advanced multi-tier architecture labs (e.g., a firewall VM connecting two different LAN segments).
 
-## 3. Virtual Network Editor
+## 4. Virtual Network Editor
 The **Virtual Network Editor** (available on Windows/Linux) allows you to:
 - Modify subnet ranges for NAT and Host-Only networks.
 - Configure port forwarding for NAT.
 - Bind specific physical adapters to bridged networks.
 - Add or remove virtual networks (VMnet0, VMnet1, VMnet8, etc.).
 
-## 4. Pentesting & Lab Considerations
+## 5. Pentesting & Lab Considerations
 - **Isolation**: Use Host-Only or LAN Segments to prevent tools (like Nmap or exploits) from accidentally touching your production network.
 - **Promiscuous Mode**: Ensure the virtual switch allows promiscuous mode if you are using packet sniffers like Wireshark inside a VM.
 - **Static IPs**: For servers (Domain Controllers, Web Servers), configure static IPs within the VMware DHCP range or outside it but within the same subnet.
 
-## 5. Troubleshooting
+## 6. Troubleshooting
 - **No IP Address**: Restart VMware DHCP services on the host.
 - **No Internet in NAT**: Check if the "VMware NAT Service" is running on the host.
 - **Cannot Ping Host**: Check host firewall settings; by default, Windows Firewall may block ICMP requests from different subnets.
 
 ---
 
-## 6. Creating an Isolated Network (Bridge)
+## 7. Creating an Isolated Network (Bridge)
 
 For lab environments, you often need an isolated network that acts like a private switch (bridge) between specific VMs.
 
@@ -119,7 +133,7 @@ This is the most "professional" way to handle lab isolation. You create a "Route
 - This allows you to capture all traffic at the gateway, implement firewall rules, and simulate real-world networking.
 
 ---
-## 7. Comparison Table
+## 8. Comparison Table
 
 | Method | Isolation Level | Host Access | Internet Access | Setup Complexity |
 | :--- | :--- | :--- | :--- | :--- |
