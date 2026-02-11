@@ -85,6 +85,36 @@ ssh mfa-target
 3. Run `google-authenticator` and follow the prompts.
 4. **IMPORTANT:** Open a second terminal and test `ssh root@129.212.185.1` before closing your current session.
 
+## Perfecting the Flow (Advanced)
+
+If you find that the prompts are in the wrong order, or you want to skip the password prompt when using SSH keys, follow these adjustments.
+
+### 1. Fix Prompt Order (Password then MFA)
+
+Ensure `/etc/pam.d/sshd` has the MFA line **after** the password inclusion:
+
+```text
+@include common-auth
+auth required pam_google_authenticator.so nullok
+```
+
+### 2. Skip Password Prompt for Pubkey Logins
+
+If you want `Public Key + MFA` but do **not** want to be prompted for your VPS password:
+
+1. Edit `/etc/pam.d/sshd`: `sudo nano /etc/pam.d/sshd`
+2. Comment out the password line:
+   ```text
+   # @include common-auth
+   auth required pam_google_authenticator.so nullok
+   ```
+3. Ensure `/etc/ssh/sshd_config` has:
+   ```text
+   AuthenticationMethods publickey,keyboard-interactive
+   ```
+
+**Warning:** This configuration will disable password-based login for SSH entirely. You will *always* need your private key and your TOTP code to enter.
+
 
 ## Google Authenticator PAM Implementation
 
