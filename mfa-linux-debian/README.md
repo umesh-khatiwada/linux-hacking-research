@@ -43,6 +43,49 @@ This directory contains research, documentation, and tools for implementing and 
 3. Test MFA functionality before deploying to production
 4. Follow security best practices outlined in the guides
 
+## Automated Implementation
+
+A helper script is provided to automate the installation and configuration of Google Authenticator for SSH.
+
+```bash
+sudo bash scripts/setup-ssh-mfa.sh
+```
+
+After running the script, each user must initialize their secret:
+
+```bash
+google-authenticator
+```
+
+## Remote Host Configuration (e.g., 129.212.185.1)
+
+If you are managing or connecting to a specific host like `129.212.185.1`, you can simplify your workflow using an SSH config entry.
+
+### 1. SSH Client Configuration
+
+Add the following to your local `~/.ssh/config`:
+
+```text
+Host mfa-target
+    HostName 129.212.185.1
+    User root
+    # Ensures you are prompted for keyboard-interactive (the TOTP)
+    PreferredAuthentications publickey,keyboard-interactive
+```
+
+Then you can connect simply with:
+```bash
+ssh mfa-target
+```
+
+### 2. Implementation on the Remote Host
+
+1. SSH into the root account: `ssh root@129.212.185.1`
+2. Run the automation script: `sudo bash scripts/setup-ssh-mfa.sh` (ensure you've copied it over)
+3. Run `google-authenticator` and follow the prompts.
+4. **IMPORTANT:** Open a second terminal and test `ssh root@129.212.185.1` before closing your current session.
+
+
 ## Google Authenticator PAM Implementation
 
 You can implement MFA on Debian using Google's PAM library `libpam-google-authenticator`, typically for SSH and optionally for local logins.
